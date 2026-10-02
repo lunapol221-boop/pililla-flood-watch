@@ -1,0 +1,291 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   NASA MISSION CONTROL DESIGN SYSTEM
+   All colors HSL. All tokens semantic. No ad-hoc colors.
+   ============================================================ */
+
+@layer base {
+  :root {
+    /* Deep space surfaces */
+    --background: 222 47% 4%;
+    --foreground: 195 80% 92%;
+
+    --surface-0: 222 47% 4%;
+    --surface-1: 220 45% 7%;
+    --surface-2: 218 42% 10%;
+    --surface-3: 216 40% 14%;
+
+    --card: 220 45% 8%;
+    --card-foreground: 195 80% 92%;
+
+    --popover: 220 45% 8%;
+    --popover-foreground: 195 80% 92%;
+
+    /* Mission cyan / NASA blue */
+    --primary: 188 100% 55%;
+    --primary-foreground: 220 60% 6%;
+    --primary-glow: 188 100% 65%;
+
+    --secondary: 218 42% 14%;
+    --secondary-foreground: 195 80% 92%;
+
+    --muted: 218 30% 16%;
+    --muted-foreground: 210 25% 65%;
+
+    --accent: 200 100% 50%;
+    --accent-foreground: 220 60% 6%;
+
+    /* Threat-level palette */
+    --risk-low: 200 100% 55%;
+    --risk-moderate: 45 100% 55%;
+    --risk-high: 25 100% 55%;
+    --risk-critical: 0 90% 58%;
+
+    --success: 145 80% 50%;
+    --warning: 45 100% 55%;
+    --destructive: 0 90% 58%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 200 60% 25% / 0.35;
+    --grid-line: 195 100% 50% / 0.08;
+    --input: 218 42% 14%;
+    --ring: 188 100% 55%;
+
+    --radius: 0.375rem;
+
+    /* Gradients */
+    --gradient-mission: radial-gradient(ellipse at top, hsl(218 60% 12%) 0%, hsl(222 47% 4%) 60%);
+    --gradient-panel: linear-gradient(135deg, hsl(220 45% 9% / 0.85), hsl(218 42% 6% / 0.85));
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-critical: linear-gradient(135deg, hsl(var(--risk-critical)), hsl(15 100% 55%));
+
+    /* Shadows / glows */
+    --glow-primary: 0 0 24px hsl(var(--primary) / 0.45), 0 0 48px hsl(var(--primary) / 0.2);
+    --glow-critical: 0 0 24px hsl(var(--risk-critical) / 0.55), 0 0 64px hsl(var(--risk-critical) / 0.25);
+    --shadow-panel: 0 8px 32px hsl(220 80% 2% / 0.6), inset 0 1px 0 hsl(195 100% 70% / 0.08);
+
+    /* Sidebar */
+    --sidebar-background: 220 50% 5%;
+    --sidebar-foreground: 195 60% 80%;
+    --sidebar-primary: 188 100% 55%;
+    --sidebar-primary-foreground: 220 60% 6%;
+    --sidebar-accent: 218 42% 12%;
+    --sidebar-accent-foreground: 188 100% 65%;
+    --sidebar-border: 200 60% 20% / 0.3;
+    --sidebar-ring: 188 100% 55%;
+  }
+
+  /* Force dark theme — this is mission control */
+  .dark {
+    color-scheme: dark;
+  }
+}
+
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+
+  html, body, #root {
+    @apply min-h-screen;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    background: var(--gradient-mission);
+    background-attachment: fixed;
+    font-feature-settings: "ss01", "cv11";
+  }
+
+  /* Global subtle grid overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+      linear-gradient(hsl(var(--grid-line)) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--grid-line)) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+  }
+
+  #root { position: relative; z-index: 1; }
+
+  ::selection { background: hsl(var(--primary) / 0.35); color: hsl(var(--foreground)); }
+
+  /* Scrollbars */
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: hsl(var(--surface-1)); }
+  ::-webkit-scrollbar-thumb { background: hsl(var(--primary) / 0.3); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: hsl(var(--primary) / 0.5); }
+}
+
+@layer components {
+  /* Glassmorphism panel */
+  .glass-panel {
+    background: var(--gradient-panel);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    border: 1px solid hsl(var(--primary) / 0.18);
+    box-shadow: var(--shadow-panel);
+    border-radius: var(--radius);
+  }
+
+  .glass-panel-hover {
+    @apply transition-all duration-300;
+  }
+  .glass-panel-hover:hover {
+    border-color: hsl(var(--primary) / 0.4);
+    box-shadow: var(--shadow-panel), 0 0 24px hsl(var(--primary) / 0.18);
+  }
+
+  /* Mission card label (uppercase mono) */
+  .mono-label {
+    @apply font-mono uppercase tracking-[0.18em] text-[10px] text-muted-foreground;
+  }
+
+  .display-font { font-family: 'Orbitron', sans-serif; letter-spacing: 0.02em; }
+  .mono-font { font-family: 'JetBrains Mono', monospace; }
+
+  /* Glow text */
+  .text-glow { text-shadow: 0 0 12px hsl(var(--primary) / 0.6); }
+  .text-glow-critical { text-shadow: 0 0 12px hsl(var(--risk-critical) / 0.7); }
+
+  /* Status dot (pulsing) */
+  .status-dot {
+    @apply inline-block w-2 h-2 rounded-full relative;
+  }
+  .status-dot::after {
+    content: '';
+    @apply absolute inset-0 rounded-full;
+    animation: status-pulse 2s ease-out infinite;
+  }
+  .status-dot.dot-low { background: hsl(var(--risk-low)); box-shadow: 0 0 8px hsl(var(--risk-low)); }
+  .status-dot.dot-low::after { background: hsl(var(--risk-low) / 0.6); }
+  .status-dot.dot-moderate { background: hsl(var(--risk-moderate)); box-shadow: 0 0 8px hsl(var(--risk-moderate)); }
+  .status-dot.dot-moderate::after { background: hsl(var(--risk-moderate) / 0.6); }
+  .status-dot.dot-high { background: hsl(var(--risk-high)); box-shadow: 0 0 8px hsl(var(--risk-high)); }
+  .status-dot.dot-high::after { background: hsl(var(--risk-high) / 0.6); }
+  .status-dot.dot-critical { background: hsl(var(--risk-critical)); box-shadow: 0 0 12px hsl(var(--risk-critical)); }
+  .status-dot.dot-critical::after { background: hsl(var(--risk-critical) / 0.7); }
+
+  /* Radar sweep — used sparingly */
+  .radar-sweep {
+    position: relative;
+    overflow: hidden;
+  }
+  .radar-sweep::before {
+    content: '';
+    position: absolute;
+    inset: -50%;
+    background: conic-gradient(from 0deg, transparent 0deg, hsl(var(--primary) / 0.18) 30deg, transparent 60deg);
+    animation: radar-rotate 4s linear infinite;
+    pointer-events: none;
+  }
+
+  /* Corner brackets — HUD style */
+  .hud-brackets { position: relative; }
+  .hud-brackets::before, .hud-brackets::after {
+    content: '';
+    position: absolute;
+    width: 12px; height: 12px;
+    border: 1px solid hsl(var(--primary) / 0.7);
+  }
+  .hud-brackets::before { top: 6px; left: 6px; border-right: none; border-bottom: none; }
+  .hud-brackets::after { bottom: 6px; right: 6px; border-left: none; border-top: none; }
+}
+
+@layer utilities {
+  .bg-surface-1 { background-color: hsl(var(--surface-1)); }
+  .bg-surface-2 { background-color: hsl(var(--surface-2)); }
+  .bg-surface-3 { background-color: hsl(var(--surface-3)); }
+
+  .text-risk-low { color: hsl(var(--risk-low)); }
+  .text-risk-moderate { color: hsl(var(--risk-moderate)); }
+  .text-risk-high { color: hsl(var(--risk-high)); }
+  .text-risk-critical { color: hsl(var(--risk-critical)); }
+
+  .bg-risk-low { background-color: hsl(var(--risk-low)); }
+  .bg-risk-moderate { background-color: hsl(var(--risk-moderate)); }
+  .bg-risk-high { background-color: hsl(var(--risk-high)); }
+  .bg-risk-critical { background-color: hsl(var(--risk-critical)); }
+
+  .border-risk-low { border-color: hsl(var(--risk-low) / 0.5); }
+  .border-risk-moderate { border-color: hsl(var(--risk-moderate) / 0.5); }
+  .border-risk-high { border-color: hsl(var(--risk-high) / 0.5); }
+  .border-risk-critical { border-color: hsl(var(--risk-critical) / 0.5); }
+}
+
+@keyframes status-pulse {
+  0% { transform: scale(1); opacity: 0.7; }
+  100% { transform: scale(3.5); opacity: 0; }
+}
+@keyframes radar-rotate {
+  to { transform: rotate(360deg); }
+}
+@keyframes scan-line {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.85; }
+}
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 12px hsl(var(--primary) / 0.4); }
+  50% { box-shadow: 0 0 24px hsl(var(--primary) / 0.7); }
+}
+@keyframes critical-pulse {
+  0%, 100% { box-shadow: 0 0 16px hsl(var(--risk-critical) / 0.5); border-color: hsl(var(--risk-critical) / 0.6); }
+  50% { box-shadow: 0 0 32px hsl(var(--risk-critical) / 0.8); border-color: hsl(var(--risk-critical)); }
+}
+
+/* Leaflet tweaks to fit mission-control dark theme */
+.leaflet-mission { background: hsl(var(--surface-1)); }
+.leaflet-container { font-family: 'JetBrains Mono', monospace; background: hsl(var(--surface-1)); }
+.leaflet-control-attribution {
+  background: hsl(var(--surface-2) / 0.7) !important;
+  color: hsl(var(--muted-foreground)) !important;
+  font-size: 10px !important;
+  padding: 2px 6px !important;
+  backdrop-filter: blur(6px);
+}
+.leaflet-control-attribution a { color: hsl(var(--primary)) !important; }
+.leaflet-control-zoom a {
+  background: hsl(var(--surface-2)) !important;
+  color: hsl(var(--primary)) !important;
+  border-color: hsl(var(--primary) / 0.3) !important;
+}
+.leaflet-control-zoom a:hover { background: hsl(var(--primary) / 0.2) !important; }
+.leaflet-popup-content-wrapper {
+  background: hsl(var(--surface-2)) !important;
+  color: hsl(var(--foreground)) !important;
+  border: 1px solid hsl(var(--primary) / 0.4);
+  border-radius: var(--radius);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  box-shadow: 0 4px 24px hsl(var(--primary) / 0.2);
+}
+.leaflet-popup-tip {
+  background: hsl(var(--surface-2)) !important;
+  border: 1px solid hsl(var(--primary) / 0.4);
+}
+.leaflet-tooltip.gis-label {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  color: hsl(var(--foreground));
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  text-shadow: 0 0 4px #000, 0 0 4px #000;
+  padding: 0;
+}
+.leaflet-tooltip.gis-label::before { display: none; }

@@ -1,0 +1,84 @@
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+
+export interface Barangay {
+  id: string;
+  name: string;
+  population: number | null;
+  elevation_m: number | null;
+  lat: number | null;
+  lng: number | null;
+}
+export interface SensorStation {
+  id: string;
+  name: string;
+  type: string | null;
+  status: string | null;
+  lat: number | null;
+  lng: number | null;
+}
+export interface FloodReading {
+  id: string;
+  station_id: string | null;
+  rainfall_mm: number | null;
+  water_level_m: number | null;
+  soil_moisture_percent: number | null;
+  recorded_at: string;
+}
+export interface EvacuationCenter {
+  id: string;
+  name: string;
+  capacity: number | null;
+  occupancy: number | null;
+  status: string | null;
+  lat: number | null;
+  lng: number | null;
+}
+export interface Alert {
+  id: string;
+  level: string;
+  title: string;
+  area: string | null;
+  message: string | null;
+  issued_at: string;
+}
+export interface WeatherForecast {
+  id: string;
+  forecast_for: string;
+  rain_mm: number | null;
+  rain_chance: number | null;
+  temp_c: number | null;
+  wind_kph: number | null;
+  condition: string | null;
+}
+
+function useTable<T>(table: string, orderBy?: { column: string; ascending?: boolean }) {
+  const [data, setData] = useState<T[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      setLoading(true);
+      let q = supabase.from(table as any).select("*");
+      if (orderBy) q = q.order(orderBy.column, { ascending: orderBy.ascending ?? true });
+      const { data: rows, error: err } = await q;
+      if (!active) return;
+      if (err) setError(err.message);
+      setData((rows as T[]) ?? []);
+      setLoading(false);
+    })();
+    return () => { active = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [table]);
+
+  return { data, loading, error };
+}
+
+export const useBarangays         = () => useTable<Barangay>("barangays", { column: "name" });
+export const useSensorStations    = () => useTable<SensorStation>("sensor_stations", { column: "name" });
+export const useEvacuationCenters = () => useTable<EvacuationCenter>("evacuation_centers", { column: "name" });
+export const useAlerts            = () => useTable<Alert>("alerts", { column: "issued_at", ascending: false });
+export const useWeatherForecasts  = () => useTable<WeatherForecast>("weather_forecasts", { column: "forecast_for" });
+export const useFloodReadings     = () => useTable<FloodReading>("flood_readings", { column: "recorded_at", ascending: false });

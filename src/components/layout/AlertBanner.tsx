@@ -1,0 +1,53 @@
+import { AlertTriangle, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
+import { useAlerts } from "@/hooks/useData";
+import { cn } from "@/lib/utils";
+
+const TONE: Record<string, { bar: string; text: string; bg: string; label: string }> = {
+  low:      { bar: "bg-risk-low",      text: "text-risk-low",      bg: "bg-risk-low/10",      label: "ADVISORY" },
+  moderate: { bar: "bg-risk-moderate", text: "text-risk-moderate", bg: "bg-risk-moderate/10", label: "WATCH" },
+  high:     { bar: "bg-risk-high",     text: "text-risk-high",     bg: "bg-risk-high/10",     label: "WARNING" },
+  critical: { bar: "bg-risk-critical", text: "text-risk-critical", bg: "bg-risk-critical/15", label: "CRITICAL" },
+};
+
+const LEVEL_RANK: Record<string, number> = { critical: 4, high: 3, moderate: 2, low: 1 };
+
+export default function AlertBanner() {
+  const { data: alerts, loading } = useAlerts();
+  if (loading) return null;
+  if (!alerts.length) return null;
+
+  // Pick the highest-severity active alert
+  const top = [...alerts].sort((a, b) => (LEVEL_RANK[b.level] ?? 0) - (LEVEL_RANK[a.level] ?? 0))[0];
+  const tone = TONE[top.level] ?? TONE.moderate;
+
+  return (
+    <div
+      className={cn(
+        "relative border-b backdrop-blur-md overflow-hidden",
+        tone.bg,
+        top.level === "critical" ? "border-risk-critical/60 animate-critical-pulse" : "border-primary/15",
+      )}
+    >
+      <div className={cn("absolute left-0 top-0 bottom-0 w-1", tone.bar, top.level === "critical" && "animate-flicker")} />
+      <div className="px-4 sm:px-6 py-2.5 flex items-center gap-3 flex-wrap">
+        <span className={cn("mono-font font-bold text-[11px] px-2 py-0.5 rounded border", tone.text)}>
+          {tone.label}
+        </span>
+        <AlertTriangle className={cn("h-4 w-4 shrink-0", tone.text)} />
+        <span className="text-sm font-medium truncate">{top.title}</span>
+        {top.area && <span className="mono-label hidden sm:inline">· {top.area}</span>}
+
+        <Link
+          to="/evacuation"
+          className={cn(
+            "ml-auto inline-flex items-center gap-2 px-3 py-1.5 rounded text-xs font-semibold transition-all",
+            "border bg-primary/15 text-primary border-primary/50 hover:bg-primary/25 hover:shadow-glow"
+          )}
+        >
+          Find Safest Route Now <ArrowRight className="h-3.5 w-3.5" />
+        </Link>
+      </div>
+    </div>
+  );
+}
