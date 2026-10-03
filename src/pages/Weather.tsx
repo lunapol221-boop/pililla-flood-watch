@@ -48,9 +48,9 @@ export default function Weather() {
   const [weatherError, setWeatherError] = useState<string | null>(null);
 
   useEffect(() => {
-    const apiKey = import.meta.env.OPENWEATHER_API_KEY?.trim();
+    const apiKey = import.meta.env.VITE_OPENWEATHER_API_KEY?.trim();
     if (!apiKey) {
-      setWeatherError("Add OPENWEATHER_API_KEY to your local .env file, then restart the dev server.");
+      setWeatherError("Add VITE_OPENWEATHER_API_KEY to your local .env file, then restart the dev server.");
       setWeatherLoading(false);
       return;
     }
