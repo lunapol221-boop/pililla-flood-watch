@@ -11,6 +11,7 @@ export default defineConfig(({ mode }) => {
     define: {
       "import.meta.env.SUPABASE_URL": JSON.stringify(env.SUPABASE_URL ?? ""),
       "import.meta.env.SUPABASE_PUBLISHABLE_KEY": JSON.stringify(env.SUPABASE_PUBLISHABLE_KEY ?? ""),
+      "import.meta.env.OPENWEATHER_API_KEY": JSON.stringify(env.OPENWEATHER_API_KEY ?? ""),
     },
     server: {
       host: "::",
