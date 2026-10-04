@@ -52,7 +52,7 @@ export default function Dashboard() {
 
   const trend = [...recent].reverse().map(r => ({
     time: new Date(r.recorded_at).toLocaleTimeString("en-PH", { hour: "2-digit", minute: "2-digit", hour12: false }),
-    rainfall: r.rainfall_mm ?? 0,
+    wind_speed: r.wind_speed ?? 0,
     water_level: r.water_level_m ?? 0,
   }));
 
@@ -134,7 +134,7 @@ export default function Dashboard() {
               <ResponsiveContainer>
                 <AreaChart data={trend} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
                   <defs>
-                    <linearGradient id="g-rain" x1="0" y1="0" x2="0" y2="1">
+                    <linearGradient id="g-wind" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.5} />
                       <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0} />
                     </linearGradient>
@@ -147,7 +147,7 @@ export default function Dashboard() {
                   <XAxis dataKey="time" tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10, fontFamily: "JetBrains Mono" }} stroke="hsl(var(--primary) / 0.3)" />
                   <YAxis tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10, fontFamily: "JetBrains Mono" }} stroke="hsl(var(--primary) / 0.3)" />
                   <Tooltip {...chartTooltip} />
-                  <Area type="monotone" dataKey="wind_speed" name="Wind Speed (m/s)" stroke="hsl(var(--primary))" strokeWidth={2} fill="url(#g-rain)" />
+                  <Area type="monotone" dataKey="wind_speed" name="Wind Speed (m/s)" stroke="hsl(var(--primary))" strokeWidth={2} fill="url(#g-wind)" />
                   <Area type="monotone" dataKey="water_level" name="Water (m)" stroke="hsl(var(--risk-high))" strokeWidth={2} fill="url(#g-water)" />
                 </AreaChart>
               </ResponsiveContainer>
