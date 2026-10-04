@@ -7,6 +7,7 @@ import type { RiskLevel } from "@/data/pililla";
 export interface FloodFeatures {
   rainfall_mm: number;            // last hour
   water_level_m: number;          // current
+  wind_speed: number;
   soil_moisture_percent: number;  // 0-100
   elevation_m: number;            // meters
   river_distance_m: number;       // distance to nearest river

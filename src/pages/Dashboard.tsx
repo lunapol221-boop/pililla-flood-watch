@@ -1,4 +1,4 @@
-import { CloudRain, Droplets, Sprout, Satellite, Construction, Shield, AlertTriangle, Map as MapIcon, Inbox } from "lucide-react";
+import { CloudRain, Wind, Droplets, Sprout, Satellite, Construction, Shield, AlertTriangle, Map as MapIcon, Inbox } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Panel, MissionCard, RiskBadge, PageHeader } from "@/components/mission/Panel";
 import { EmptyState } from "@/components/mission/EmptyState";
@@ -37,6 +37,7 @@ export default function Dashboard() {
   const features: FloodFeatures = {
     rainfall_mm: avg(recent.map(r => r.rainfall_mm)),
     water_level_m: avg(recent.map(r => r.water_level_m)),
+    wind_speed: avg(recent.map(r => r.wind_speed)),
     soil_moisture_percent: avg(recent.map(r => r.soil_moisture_percent)),
     elevation_m: avg(barangays.map(b => b.elevation_m)) || 10,
     river_distance_m: 280,
@@ -49,7 +50,6 @@ export default function Dashboard() {
   const hasReadings = recent.length > 0;
   const pred = hasReadings ? predictFlood(features) : null;
 
-  // Trend (last 24 readings, oldest first)
   const trend = [...recent].reverse().map(r => ({
     time: new Date(r.recorded_at).toLocaleTimeString("en-PH", { hour: "2-digit", minute: "2-digit", hour12: false }),
     rainfall: r.rainfall_mm ?? 0,
@@ -111,9 +111,10 @@ export default function Dashboard() {
         />
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
         <Telemetry icon={<CloudRain className="h-4 w-4" />} label="RAINFALL (avg)" value={hasReadings ? features.rainfall_mm.toFixed(1) : "—"} unit="mm" />
         <Telemetry icon={<Droplets className="h-4 w-4" />} label="WATER LEVEL" value={hasReadings ? features.water_level_m.toFixed(2) : "—"} unit="m" />
+        <Telemetry icon={<Wind className="h-4 w-4" />} label="WIND SPEED" value={hasReadings ? features.wind_speed.toFixed(2) : "—"} unit="m/s" />
         <Telemetry icon={<Sprout className="h-4 w-4" />} label="SOIL MOISTURE" value={hasReadings ? features.soil_moisture_percent.toFixed(0) : "—"} unit="%" />
         <Telemetry icon={<Satellite className="h-4 w-4" />} label="SAT. NDWI" value="—" />
         <Telemetry icon={<Construction className="h-4 w-4" />} label="ROAD CONDITION" value="—" unit="/ 100" />

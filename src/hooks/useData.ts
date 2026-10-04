@@ -23,6 +23,7 @@ export interface FloodReading {
   rainfall_mm: number | null;
   water_level_m: number | null;
   soil_moisture_percent: number | null;
+  wind_speed: number | null;
   recorded_at: string;
 }
 export interface EvacuationCenter {
