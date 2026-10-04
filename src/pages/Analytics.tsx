@@ -22,7 +22,7 @@ export default function Analytics() {
     time: new Date(r.recorded_at).toLocaleTimeString("en-PH", { hour: "2-digit", minute: "2-digit", hour12: false }),
     wind_speed: r.wind_speed ?? 0,
     water_level: r.water_level_m ?? 0,
-    image_url: r.image_link ?? ""
+    image_url: r.image_url ?? ""
   }));
 
   return (
