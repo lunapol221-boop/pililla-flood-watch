@@ -123,7 +123,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
         <Panel
           label="TIMESERIES · 24H"
-          title="Rainfall & Water Level Trend"
+          title="Wind Speed & Water Level Trend"
           className="xl:col-span-2"
           action={pred && <RiskBadge level={pred.risk_level} />}
         >
@@ -147,7 +147,7 @@ export default function Dashboard() {
                   <XAxis dataKey="time" tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10, fontFamily: "JetBrains Mono" }} stroke="hsl(var(--primary) / 0.3)" />
                   <YAxis tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10, fontFamily: "JetBrains Mono" }} stroke="hsl(var(--primary) / 0.3)" />
                   <Tooltip {...chartTooltip} />
-                  <Area type="monotone" dataKey="rainfall" name="Rain (mm)" stroke="hsl(var(--primary))" strokeWidth={2} fill="url(#g-rain)" />
+                  <Area type="monotone" dataKey="wind_speed" name="Wind Speed (m/s)" stroke="hsl(var(--primary))" strokeWidth={2} fill="url(#g-rain)" />
                   <Area type="monotone" dataKey="water_level" name="Water (m)" stroke="hsl(var(--risk-high))" strokeWidth={2} fill="url(#g-water)" />
                 </AreaChart>
               </ResponsiveContainer>
