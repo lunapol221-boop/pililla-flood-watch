@@ -25,6 +25,7 @@ export interface FloodReading {
   soil_moisture_percent: number | null;
   wind_speed: number | null;
   recorded_at: string;
+  image_link:string;
 }
 export interface EvacuationCenter {
   id: string;

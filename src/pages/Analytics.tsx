@@ -1,10 +1,12 @@
 import { Panel, PageHeader, RiskBadge } from "@/components/mission/Panel";
 import { EmptyState } from "@/components/mission/EmptyState";
 import { useFloodReadings, useBarangays } from "@/hooks/useData";
+import { useState } from "react";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import {
   ResponsiveContainer, ComposedChart, Bar, Line, XAxis, YAxis, Tooltip, CartesianGrid,
 } from "recharts";
-import { BarChart3 } from "lucide-react";
+import { BarChart3, Image as ImageIcon } from "lucide-react";
 
 const tt = {
   contentStyle: { background: "hsl(var(--surface-2))", border: "1px solid hsl(var(--primary) / 0.4)", borderRadius: 4, fontFamily: "JetBrains Mono", fontSize: 11 },
@@ -14,11 +16,13 @@ const tt = {
 export default function Analytics() {
   const { data: readings } = useFloodReadings();
   const { data: barangays } = useBarangays();
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const trend = [...readings].slice(0, 24).reverse().map(r => ({
     time: new Date(r.recorded_at).toLocaleTimeString("en-PH", { hour: "2-digit", minute: "2-digit", hour12: false }),
-    rainfall: r.rainfall_mm ?? 0,
+    wind_speed: r.wind_speed ?? 0,
     water_level: r.water_level_m ?? 0,
+    image_url: r.image_link ?? ""
   }));
 
   return (
@@ -42,7 +46,7 @@ export default function Analytics() {
                   <YAxis yAxisId="l" tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10, fontFamily: "JetBrains Mono" }} stroke="hsl(var(--primary) / 0.3)" />
                   <YAxis yAxisId="r" orientation="right" tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10, fontFamily: "JetBrains Mono" }} stroke="hsl(var(--risk-high) / 0.3)" />
                   <Tooltip {...tt} />
-                  <Bar yAxisId="l" dataKey="rainfall" fill="hsl(var(--primary) / 0.6)" name="Rainfall (mm)" />
+                  <Bar yAxisId="l" dataKey="wind_speed" fill="hsl(var(--primary) / 0.6)" name="Wind Speed m/s" />
                   <Line yAxisId="r" type="monotone" dataKey="water_level" stroke="hsl(var(--risk-high))" strokeWidth={2} dot={false} name="Water (m)" />
                 </ComposedChart>
               </ResponsiveContainer>
@@ -82,6 +86,7 @@ export default function Analytics() {
                   <th className="py-2 pr-3">RAINFALL</th>
                   <th className="py-2 pr-3">WATER LEVEL</th>
                   <th className="py-2 pr-3">DELTA</th>
+                  <th className="py-2 pr-3">IMAGE</th>
                 </tr>
               </thead>
               <tbody className="mono-font">
@@ -93,6 +98,21 @@ export default function Analytics() {
                     <td className="py-2 pr-3">
                       {t.water_level > 2.0 ? <RiskBadge level="high" /> : t.water_level > 1.5 ? <RiskBadge level="moderate" /> : <RiskBadge level="low" />}
                     </td>
+                    <td className="py-2 pr-3">
+                      {t.image_url ? (
+                        <button
+                          type="button"
+                          onClick={() => setSelectedImage(t.image_url)}
+                          aria-label={`Open sensor image recorded at ${t.time}`}
+                          className="inline-flex items-center gap-1.5 text-primary hover:underline"
+                        >
+                          <ImageIcon className="h-4 w-4" />
+                          Open image
+                        </button>
+                      ) : (
+                        <span className="text-muted-foreground">No image</span>
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -100,6 +120,19 @@ export default function Analytics() {
           </div>
         )}
       </Panel>
+
+      <Dialog open={selectedImage !== null} onOpenChange={(open) => !open && setSelectedImage(null)}>
+        <DialogContent className="max-w-5xl border-primary/20 bg-background p-4 sm:p-6">
+          <DialogTitle className="sr-only">Sensor image</DialogTitle>
+          {selectedImage && (
+            <img
+              src={selectedImage}
+              alt="Flood sensor reading"
+              className="max-h-[75vh] w-full object-contain"
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
