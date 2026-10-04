@@ -83,7 +83,7 @@ export default function Analytics() {
               <thead>
                 <tr className="text-left mono-label border-b border-primary/15">
                   <th className="py-2 pr-3">TIME</th>
-                  <th className="py-2 pr-3">RAINFALL</th>
+                  <th className="py-2 pr-3">WIND SPEED</th>
                   <th className="py-2 pr-3">WATER LEVEL</th>
                   <th className="py-2 pr-3">DELTA</th>
                   <th className="py-2 pr-3">IMAGE</th>
