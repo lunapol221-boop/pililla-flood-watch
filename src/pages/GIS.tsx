@@ -3,7 +3,7 @@ import { EmptyState } from "@/components/mission/EmptyState";
 import GISMap from "@/components/map/GISMap";
 import { useSensorStations, useEvacuationCenters } from "@/hooks/useData";
 import { useFloodRisk } from "@/hooks/useFloodRisk";
-import { Map as MapIcon, Radio, Building2, Activity } from "lucide-react";
+import { Map as MapIcon, Radio, Building2, Activity, Navigation, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export default function GIS() {
@@ -25,6 +25,44 @@ export default function GIS() {
     return `Updated ${m}m ago`;
   })();
 
+  // --- NEW: Routing State & Logic ---
+  const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
+  const [routingDestination, setRoutingDestination] = useState<{ lat: number; lng: number; name: string } | null>(null);
+  const [locationError, setLocationError] = useState<string | null>(null);
+
+  // Get user's current location on mount
+  useEffect(() => {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation([
+            position.coords.latitude,
+            position.coords.longitude,
+          ]);
+          setLocationError(null);
+        },
+        (error) => {
+          console.error("Geolocation error:", error);
+          setLocationError("Location access denied. Using map center.");
+          // Fallback to a default location (e.g., Pililla, Rizal proper)
+          setUserLocation([14.2744, 121.2450]);
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      );
+    } else {
+      setLocationError("Geolocation not supported.");
+    }
+  }, []);
+
+  const handleSetDestination = (lat: number, lng: number, name: string) => {
+    setRoutingDestination({ lat, lng, name });
+  };
+
+  const handleClearRoute = () => {
+    setRoutingDestination(null);
+  };
+  // ---------------------------------
+
   const mapBarangays = barangays
     .filter(b => b.lat != null && b.lng != null)
     .map(b => ({
@@ -33,9 +71,11 @@ export default function GIS() {
       risk_score: b.risk_score,
       risk_level: b.risk_level,
     }));
+    
   const mapSensors = sensors
     .filter(s => s.lat != null && s.lng != null)
     .map(s => ({ id: s.id, name: s.name, lat: Number(s.lat), lng: Number(s.lng), status: s.status, type: s.type }));
+    
   const mapCenters = centers
     .filter(c => c.lat != null && c.lng != null)
     .map(c => ({ id: c.id, name: c.name, lat: Number(c.lat), lng: Number(c.lng), capacity: c.capacity, occupancy: c.occupancy }));
@@ -60,11 +100,34 @@ export default function GIS() {
           </span>
         </div>
 
+        {/* --- NEW: Route Status Panel --- */}
+        {routingDestination && (
+          <div className="absolute top-3 left-3 z-20 glass-panel px-3 py-2 flex items-center gap-3">
+            <Navigation className="h-4 w-4 text-primary animate-pulse" />
+            <div className="flex flex-col">
+              <span className="mono-font text-[10px] uppercase tracking-wider text-muted-foreground">
+                Routing To
+              </span>
+              <span className="text-xs font-medium truncate max-w-[150px]">
+                {routingDestination.name}
+              </span>
+            </div>
+            <button 
+              onClick={handleClearRoute}
+              className="ml-2 p-1 rounded hover:bg-destructive/20 transition-colors"
+              title="Clear Route"
+            >
+              <X className="h-4 w-4 text-destructive" />
+            </button>
+          </div>
+        )}
+
         <GISMap
           className="h-[640px]"
           barangays={mapBarangays}
           sensors={mapSensors}
           centers={mapCenters}
+          userLocation={userLocation}
         />
       </div>
 
@@ -117,10 +180,20 @@ export default function GIS() {
           ) : (
             <ul className="space-y-1.5 text-sm">
               {centers.map(c => (
-                <li key={c.id} className="px-2 py-1.5 rounded">
+                /* --- NEW: Made list items clickable to set routing destination --- */
+                <li 
+                  key={c.id} 
+                  className={`px-2 py-1.5 rounded cursor-pointer transition-colors flex flex-col gap-1
+                    ${routingDestination?.lat === Number(c.lat) ? 'bg-primary/15 ring-1 ring-primary' : 'hover:bg-primary/10'}`}
+                  onClick={() => handleSetDestination(Number(c.lat), Number(c.lng), c.name)}
+                >
                   <div className="flex items-center justify-between">
                     <span className="font-medium truncate">{c.name}</span>
                     <span className="mono-font text-[10px] text-primary">{c.occupancy ?? 0}/{c.capacity ?? "—"}</span>
+                  </div>
+                  <div className="flex items-center gap-1 text-[10px] text-primary/80 uppercase mono-font tracking-wider">
+                    <Navigation className="h-3 w-3" />
+                    {routingDestination?.lat === Number(c.lat) ? "Selected" : "Set as Destination"}
                   </div>
                 </li>
               ))}
