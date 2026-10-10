@@ -3,7 +3,7 @@ import { EmptyState } from "@/components/mission/EmptyState";
 import GISMap from "@/components/map/GISMap";
 import { useSensorStations, useEvacuationCenters } from "@/hooks/useData";
 import { useFloodRisk } from "@/hooks/useFloodRisk";
-import { Map as MapIcon, Radio, Building2, Activity, Navigation, X, AlertTriangle } from "lucide-react";
+import { Map as MapIcon, Radio, Building2, Activity, Navigation, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export default function GIS() {
@@ -25,48 +25,32 @@ export default function GIS() {
     return `Updated ${m}m ago`;
   })();
 
-  // --- Routing State & Logic ---
+  // --- NEW: Routing State & Logic ---
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
   const [routingDestination, setRoutingDestination] = useState<{ lat: number; lng: number; name: string } | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
 
-  // Get user's current location continuously for high accuracy
+  // Get user's current location on mount
   useEffect(() => {
     if ("geolocation" in navigator) {
-      // Using watchPosition instead of getCurrentPosition allows the GPS 
-      // to continuously refine its accuracy over a few seconds.
-      const watchId = navigator.geolocation.watchPosition(
+      navigator.geolocation.getCurrentPosition(
         (position) => {
           setUserLocation([
             position.coords.latitude,
             position.coords.longitude,
           ]);
-          setLocationError(null); // Clear error if we successfully get a lock
+          setLocationError(null);
         },
         (error) => {
           console.error("Geolocation error:", error);
-          if (error.code === error.PERMISSION_DENIED) {
-            setLocationError("Location access denied. Enable GPS permissions in browser settings.");
-          } else if (error.code === error.POSITION_UNAVAILABLE) {
-            setLocationError("Location information is unavailable. Check your GPS/Network.");
-          } else {
-            setLocationError("Location request timed out.");
-          }
-          // Fallback to a default location (Pililla, Rizal proper) ONLY if we don't have a location yet
-          setUserLocation((prev) => prev ?? [14.2744, 121.2450]);
+          setLocationError("Location access denied. Using map center.");
+          // Fallback to a default location (e.g., Pililla, Rizal proper)
+          setUserLocation([14.2744, 121.2450]);
         },
-        { 
-          enableHighAccuracy: true, // Forces GPS usage over IP/Wifi triangulation
-          timeout: 20000,           // Give it more time to lock on
-          maximumAge: 0             // Never use a cached location
-        }
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
       );
-
-      // Cleanup listener on unmount
-      return () => navigator.geolocation.clearWatch(watchId);
     } else {
-      setLocationError("Geolocation is not supported by this browser.");
-      setUserLocation([14.2744, 121.2450]);
+      setLocationError("Geolocation not supported.");
     }
   }, []);
 
@@ -116,7 +100,7 @@ export default function GIS() {
           </span>
         </div>
 
-        {/* --- Route Status Panel --- */}
+        {/* --- NEW: Route Status Panel --- */}
         {routingDestination && (
           <div className="absolute top-3 left-3 z-20 glass-panel px-3 py-2 flex items-center gap-3">
             <Navigation className="h-4 w-4 text-primary animate-pulse" />
@@ -138,21 +122,12 @@ export default function GIS() {
           </div>
         )}
 
-        {/* --- Location Error Warning --- */}
-        {locationError && (
-          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 glass-panel px-4 py-2 flex items-center gap-2 border border-destructive/50">
-            <AlertTriangle className="h-4 w-4 text-destructive" />
-            <span className="text-xs text-destructive font-medium">{locationError}</span>
-          </div>
-        )}
-
         <GISMap
           className="h-[640px]"
           barangays={mapBarangays}
           sensors={mapSensors}
           centers={mapCenters}
           userLocation={userLocation}
-          routingDestination={routingDestination} // <-- THIS WAS MISSING IN YOUR CODE
         />
       </div>
 
@@ -205,6 +180,7 @@ export default function GIS() {
           ) : (
             <ul className="space-y-1.5 text-sm">
               {centers.map(c => (
+                /* --- NEW: Made list items clickable to set routing destination --- */
                 <li 
                   key={c.id} 
                   className={`px-2 py-1.5 rounded cursor-pointer transition-colors flex flex-col gap-1
